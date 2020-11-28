@@ -1,0 +1,29 @@
+{
+  "name": "User",
+  "columns": {
+    "id": {
+      "primary": true,
+      "type": "uuid",
+      "generated": "uuid"
+    },
+    "firstName": {
+      "type": "text"
+    },
+    "lastName": {
+      "type": "text"
+    }
+  },
+  "relations": {
+    "posts": {
+      "target": "Post",
+      "type": "one-to-many",
+      "inverseSide": "user",
+      "cascade": true
+    }
+  },
+  "permissions": {
+    "read": ["user.read", "self"],
+    "update": ["user.update", "self"],
+    "delete": "user.delete"
+  }
+}

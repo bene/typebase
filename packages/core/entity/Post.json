@@ -1,0 +1,25 @@
+{
+  "name": "Post",
+  "columns": {
+    "id": {
+      "primary": true,
+      "type": "uuid",
+      "generated": "uuid"
+    },
+    "title": {
+      "type": "text"
+    }
+  },
+  "relations": {
+    "user": {
+      "target": "User",
+      "type": "many-to-one",
+      "inverseSide": "posts"
+    }
+  },
+  "permissions": {
+    "read": ["user.read", "self"],
+    "update": ["user.update", "self"],
+    "delete": "user.delete"
+  }
+}
