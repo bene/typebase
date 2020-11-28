@@ -9,7 +9,6 @@ const run = async () => {
   const UserEntity = new EntitySchema(User as any);
 
   await base.registerEntities([UserEntity, PostEntity]);
-
 };
 
 run();
