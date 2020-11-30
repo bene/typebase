@@ -6,10 +6,10 @@
       "type": "uuid",
       "generated": "uuid"
     },
-    "firstName": {
+    "email": {
       "type": "text"
     },
-    "lastName": {
+    "provider": {
       "type": "text"
     }
   },

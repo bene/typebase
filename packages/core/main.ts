@@ -1,6 +1,6 @@
-import TypeBase, { EntitySchema } from './typebase-app';
-import * as User from './entity/User.json';
-import * as Post from './entity/Post.json';
+import TypeBase, { EntitySchema } from './typebase';
+import * as User from './entities/User.json';
+import * as Post from './entities/Post.json';
 
 const run = async () => {
   const base = new TypeBase();

@@ -2,21 +2,23 @@ import { createConnection, EntitySchema, Connection } from 'typeorm';
 import * as express from 'express';
 import * as hbs from 'express-hbs';
 import * as bodyParser from 'body-parser';
-import { Controller } from './controller';
+import { DocumentController } from './controllers/document';
+import { TypesController } from './controllers/types';
 
 class TypeBase {
-  private _entities: EntitySchema[] = [];
+  protected _entities: EntitySchema[] = [];
   private _connection: Connection;
   private readonly _application: express.Application;
 
   constructor() {
     this._application = express();
-    this._application.use(bodyParser.json());
-    this._application.engine('hbs', hbs.express4());
-    this._application.set('view engine', 'hbs');
-    this._application.set('views', __dirname + '/views');
 
-    this._application.get(
+    this.application.use(bodyParser.json());
+    this.application.engine('hbs', hbs.express4());
+    this.application.set('view engine', 'hbs');
+    this.application.set('views', __dirname + '/views');
+
+    this.application.get(
       '/status',
       (req: express.Request, res: express.Response) => {
         const errNotConnected = {
@@ -35,9 +37,14 @@ class TypeBase {
       }
     );
 
-    this._application.listen(3223);
+    this.application.use('/types', new TypesController(this).Router);
+    this.application.listen(3223);
 
     console.log('TypeBase server listening on port 3223.');
+  }
+
+  public isConnected(): boolean {
+    return this._connection?.isConnected;
   }
 
   public async connect() {
@@ -64,36 +71,15 @@ class TypeBase {
     await this.connect();
   }
 
-  public isConnected(): boolean {
-    return this._connection?.isConnected;
-  }
-
-  public async registerEntity(entity: EntitySchema, createController = true) {
-    this._entities.push(entity);
-    await this.reconnect();
-
-    if (createController) {
-      this.createController(entity);
-    }
-  }
-
   public async registerEntities(entities: EntitySchema[]) {
     this._entities = this._entities.concat(entities);
     await this.reconnect();
     entities.forEach((e) => this.createController(e));
   }
 
-  public get application(): express.Application {
-    return this._application;
-  }
-
-  public get database(): Connection {
-    return this._connection;
-  }
-
   public createController(entity: EntitySchema) {
     const name = entity.options.name;
-    const controller = new Controller(this, entity);
+    const controller = new DocumentController(this, entity);
 
     this.application.use(`/${name}`, controller.Router);
     this.application.use(
@@ -106,6 +92,18 @@ class TypeBase {
         res.status(err.statusCode || 500).json(err);
       }
     );
+  }
+
+  public get entities(): EntitySchema[] {
+    return this._entities;
+  }
+
+  public get application(): express.Application {
+    return this._application;
+  }
+
+  public get database(): Connection {
+    return this._connection;
   }
 }
 
